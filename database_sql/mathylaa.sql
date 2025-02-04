@@ -134,7 +134,7 @@ CREATE TABLE transfert (
   nomDestinataire VARCHAR(50) NOT NULL,
   telDestinataire VARCHAR(50) NOT NULL,
   piece ENUM('avec piece','sans piece') NOT NULL,
-  montantEnvoyer DECIMAL(15,2) NOT NULL CHECK (montantEnvoyer >= 0),
+  montant DECIMAL(15,2) NOT NULL CHECK (montant>= 0),
   frais DECIMAL(15,2) NOT NULL CHECK (frais >= 0),
   codeTransfert VARCHAR(50) NOT NULL UNIQUE,
   statut ENUM('en attente','valider','annuler') NOT NULL,
@@ -146,7 +146,21 @@ CREATE TABLE transfert (
   FOREIGN KEY (created_by) REFERENCES Utilisateurs(id) ON DELETE SET NULL,
   FOREIGN KEY (modify_by) REFERENCES Utilisateurs(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Trigger pour générer un code de transfert unique
+DELIMITER $$
 
+CREATE TRIGGER before_insert_transfert
+BEFORE INSERT ON transfert
+FOR EACH ROW
+BEGIN
+    SET NEW.codeTransfert = CONCAT(
+        UPPER(SUBSTRING(MD5(RAND()), 1, 4)),
+        LPAD(FLOOR(RAND() * 10000), 4, '0'),
+        UPPER(SUBSTRING(MD5(NOW()), 1, 2))
+    );
+END $$
+
+DELIMITER ;
 -- Table des retraits
 CREATE TABLE retraits (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -189,7 +203,6 @@ CREATE TABLE caisses (
   id_depense INT DEFAULT NULL,
   statut ENUM('entrer', 'sortie') NOT NULL DEFAULT 'entrer',
   montant DECIMAL(20, 2) NOT NULL CHECK (montant >= 0),
-  statut INT NOT NULL,
   created_by INT DEFAULT NULL,
   modify_by INT DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

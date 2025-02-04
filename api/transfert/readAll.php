@@ -33,9 +33,7 @@ if (isset($_GET)) {
                         "zone" =>  $zone["libelle"] ?? null,  // Libellé de la zone
                         
                      
-                            
                         
-                
                 ];
 
                 // Ajouter l'objet construit à la liste des transferts
