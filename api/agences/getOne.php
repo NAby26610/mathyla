@@ -10,6 +10,7 @@ if (isset($_GET['id'])) {
         if ($agence):
             // Récupérer les informations de la zone associée à l'agence
             $zone = ModeleClasse::getoneByname("id", "zones", $agence["id_zone"]);
+            $devise = ModeleClasse::getoneByname("id", "devise", $zone["id_devise"]);
             
             // Récupérer les informations du créateur de l'agence
             $utilisateur = ModeleClasse::getoneByname("id", "utilisateurs", $agence["created_by"]);
@@ -25,6 +26,7 @@ if (isset($_GET['id'])) {
                 "id" => $agence["id"],
                 "id_zone" => $agence["id_zone"] ?? null,
                 "zone" => $zone["libelle"] ?? null,  // Nom de la zone associée
+                "devise" => $devise["libelle"] ?? null,  // Nom de la zone associée
                 "libelle" => $agence["libelle"],
                 "telephone" => $agence["telephone"],
                 "soldeInitial" => $agence["soldeInitial"],

@@ -1,5 +1,5 @@
-CREATE DATABASE mathyla;
-USE mathyla;
+CREATE DATABASE db_mathyla;
+USE db_mathyla;
 
 -- Table des utilisateurs
 CREATE TABLE utilisateurs (
@@ -8,7 +8,7 @@ CREATE TABLE utilisateurs (
     prenom VARCHAR(50) NOT NULL,
     telephone VARCHAR(50) NOT NULL,
     roles ENUM('admin', 'employer') NOT NULL,
-    codePin VARCHAR(10) NOT NULL,
+    codePin VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     adresse VARCHAR(255) DEFAULT NULL,
     mot_de_passe VARCHAR(255) NOT NULL,

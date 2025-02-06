@@ -9,10 +9,10 @@ if (!empty($_POST) && isset($_POST['id'])) {
         extract($_POST);
 
         // Préparer la mise à jour
-        if (ModeleClasse::update('transfert', $_POST, $id)) {
+        if (!ModeleClasse::update('transfert', $_POST, $id)) {
             $reponse = [
                 'status' => 1,
-                'message' => "Mise à jour effectuée avec succès"
+                'message' => "Retrait confirmer avec succès"
             ];
         } else {
             $reponse = [

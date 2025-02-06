@@ -1,10 +1,8 @@
 <?php
 require_once('../../config/database.php');
 
-if (isset($_GET)) {
-
-    $codeTransfert = $_GET['type'];
-    // echo json_encode($_GET);
+if (isset($_GET['codeTransfert'])) {
+    $codeTransfert = $_GET['codeTransfert'];
     extract($_GET);
 
     $response = [];
@@ -12,29 +10,10 @@ if (isset($_GET)) {
         // Récupérer le transfert en fonction du codeTransfert
         $read = ModeleClasse::getoneByname('codeTransfert', 'transfert', $codeTransfert);
 
-        $AffectationUser = ModeleClasse::getoneByname('id_utilisateur', 'affectations', $id);
-        $agence = ModeleClasse::getoneByname('id', 'agences', $AffectationUser['id_agence']);
-        $zone = ModeleClasse::getoneByname('id', 'zones', $agence['id_zone']);
-
         if (!$read) {
             $response = [
                 'status' => 0,
                 'message' => 'Aucun transfert trouvé pour ce code'
-            ];
-        } elseif ($read['created_by'] == $id) {
-            $response = [
-                'status' => 0,
-                'message' => 'Vous ne pouvez pas payer un transfert que vous avez placer...'
-            ];
-        } elseif ($read['id_zone'] != $zone['id']) {
-            $response = [
-                'status' => 0,
-                'message' => 'Ce transfert n\'est pas orienter dans votre zone, impossible de payer...'
-            ];
-        } elseif ($read['statut'] == 'valider') {
-            $response = [
-                'status' => 0,
-                'message' => 'Ce code est deja valider pour plus d\'info, veuillez tracker...'
             ];
         } else {
             $statutTransfert = $read['statut'];
@@ -46,14 +25,15 @@ if (isset($_GET)) {
 
             // Récupérer les informations de la zone associée au transfert
             $zone = ModeleClasse::getoneByname('id', 'zones', $read['id_zone'] ?? null);
+            $devise = ModeleClasse::getoneByname('id', 'devise', $zone['id_devise']);
 
             // Récupérer les informations du retrait (si disponible)
             $utilisateurRetrait = $agenceRetrait = null;
             if (!empty($read['modify_by'])) {
                 $utilisateurRetrait = ModeleClasse::getoneByname('id', 'utilisateurs', $read['modify_by']);
-                $agenceRetrait = ModeleClasse::getoneByname('id', 'agences', $read['id_agence'] ?? null);
+                $retrai_ = ModeleClasse::getoneByname('id_transfert', 'retraits', $read['id'] ?? null);
+                $agenceRetrait = ModeleClasse::getoneByname('id', 'agences', $retrai_['id_agence'] ?? null);
             }
-
 
             // Controle de retrait...
             if (ModeleClasse::getoneByNameDesc('retraits', 'id_transfert', $read['id'])):
@@ -64,7 +44,9 @@ if (isset($_GET)) {
                 }
             endif;
 
-            $devise = ModeleClasse::getoneByname('id', 'devise', $zone['id_devise']);
+            $netAPayer = 0;
+
+
             // Construire l'objet à retourner
             $objet = [
                 "transfert" => [
@@ -112,6 +94,7 @@ if (isset($_GET)) {
                         "libelle" => $agenceRetrait["libelle"] ?? null,
                         "telephone" => $agenceRetrait["telephone"] ?? null,
                     ] : null,
+                    'created_at' => $retrai_['created_at'] ?? null
                 ]
             ];
             array_push($response, $objet);

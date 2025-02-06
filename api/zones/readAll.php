@@ -17,8 +17,7 @@ if (isset($_GET)) {
                     "devise" => $devise["libelle"] ?? null,  // Récupérer l'ID de la devise
                     "libelle" => $data["libelle"] ?? null,
                     "created_at" => $data["created_at"] ?? null,
-                    "created_by" => $data["created_by"] ?? null,
-                
+                    "created_by" => $data["created_by"] ?? null,                
                 ];
                 array_push($datazones, $objet);
             }

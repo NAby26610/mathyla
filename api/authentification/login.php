@@ -6,18 +6,26 @@ require_once('../../config/database.php');
 if (!empty($_POST)) :
     $_POST['mot_de_passe'] = md5($_POST['mot_de_passe']);
     extract($_POST);
-  // echo json_encode($_POST);
+    // echo json_encode($_POST);
     $response = [];
     // Essaie de te connecter
     try {
-        $userAuth = ModeleClasse::loginUser('utilisateurs', 'email',$email, 'mot_de_passe',$mot_de_passe);
+        $userAuth = ModeleClasse::loginUser('utilisateurs', 'email', $email, 'mot_de_passe', $mot_de_passe);
         if ($userAuth) :
             // Création de l'objet utilisateur avec les accès
+            $Agence = ModeleClasse::getoneByNameDesc('affectations', 'id_utilisateur', $userAuth['id']);
+            $privilege = 0;
+            if ($userAuth['roles'] == 'admin')
+                $privilege = 1;
+            else
+                $privilege = 0;
             $response = [
-                'statut' => 1,
                 'message' => "Connexion réussi !",
-                'idUser' => $userAuth['id'], 
-                'nomComplet' => $userAuth['nom']. '' .$userAuth['prenom'],
+                'id_agence' => $Agence['id_agence'] ?? null,
+                'idUser' => $userAuth['id'],
+                'nomComplet' => $userAuth['nom'] . '' . $userAuth['prenom'],
+                'statut' => 1,
+                'privilege' => $privilege,
                 'access_token' => loginToken(32)  // Génération d'un token d'accès
             ];
         else :

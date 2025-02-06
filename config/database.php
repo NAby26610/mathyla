@@ -14,7 +14,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 
 try {
-    $connect = new PDO('mysql:host=localhost;dbname=mathyla', 'root', '');
+    $connect = new PDO('mysql:host=localhost;dbname=db_mathyla', 'root', '');
 } catch (Exception $e) {
     // die('Erreur  de connexion  : ' . $e->getMessage());
     echo json_encode("erreur de connexion : ", $e->getMessage());
