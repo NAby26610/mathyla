@@ -17,6 +17,11 @@ if (isset($_GET)) {
                 $zone = ModeleClasse::getoneByname('id', 'zones', $data['id_zone']);
                 $devise = ModeleClasse::getoneByname('id', 'devise', $zone['id_devise']);
 
+                // DEVISE SOURCE
+                $Agence = ModeleClasse::getoneByname('id', 'agences', $data['id_agence']);
+                $Zone_ = ModeleClasse::getoneByname('id', 'zones', $Agence['id_zone']);
+                $DeviseSource = ModeleClasse::getoneByname('id', 'devise', $Zone_['id_devise']);
+
                 // Construire un objet pour le transfert avec les informations associées
                 $objet = [
                     "id" => $data["id"],
@@ -25,7 +30,7 @@ if (isset($_GET)) {
                     "nomDestinataire" => $data["nomDestinataire"] ?? null,  // Nom du destinataire
                     "telDestinataire" => $data["telDestinataire"] ?? null,  // Téléphone du destinataire
                     "piece" => $data["piece"] ?? null,  // Type de pièce
-                    "montant" => formatNumber2($data["montant"]) ?? 0,
+                    "montant" => formatNumber2($data["montant"]) . ' | ' . $DeviseSource['libelle'] ?? 0,
                     "frais" => formatNumber2($data["frais"]) ?? 0,
                     "montantRetrait" => formatNumber2($data['montantRetrait']) . ' ' . $devise['libelle'] ?? 0,
                     "codeTransfert" => $data["codeTransfert"] ?? null,  // Code unique de transfert

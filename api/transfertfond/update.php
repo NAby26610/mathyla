@@ -4,12 +4,12 @@ require_once '../../config/database.php';
 $postdata = json_decode(file_get_contents("php://input"), true);
 
 if (!empty($_POST) && isset($_POST['id'])) {
-    $transfertfond = $_POST['transfertfond'];
-    unset($_POST['transfertfond']);
+    $table = $_POST['table'];
+    unset($_POST['table']);
     try {
         extract($_POST);
 
-        if (ModeleClasse::update($transfertfond, $_POST, $id)) {
+        if (!ModeleClasse::update($table, $_POST, $id)) {
             $reponse = [
                 'status' => 1,
                 'message' => "Mise à jour effectuée avec succès"

@@ -6,6 +6,20 @@ function deb($data)
     die();
 }
 
+/**
+ * Convertir une date en format 'YYYY-MM-DD' (GMT)
+ */
+function dateConvert($votre_date)
+{
+    try {
+        $timezone = new DateTimeZone('GMT');
+        $date = new DateTime($votre_date, $timezone);
+        return $date->format('Y-m-d');
+    } catch (Exception $e) {
+        return $e->getMessage(); // Gérer les erreurs si la date est invalide
+    }
+}
+
 // Generation du Token d'Auth
 function generateToken_($userId)
 {
@@ -29,6 +43,21 @@ function format2Chart($data)
         $tab[1] = "00";
     endif;
     return $tab[0] . '.' . substr($tab[1], 0, 2);
+}
+
+function _Aujourdhui()
+{
+    // Définir le fuseau horaire GMT+00
+    $timezone = new DateTimeZone('GMT');
+
+    // Créer une nouvelle instance de DateTime avec le fuseau horaire défini
+    $date = new DateTime('now', $timezone);
+
+    // Formater la date selon votre besoin
+    $date_format = $date->format('Y-m-d');
+
+    // Afficher la date
+    return $date_format;
 }
 
 function obtenirDateHeureActuelles()

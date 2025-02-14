@@ -2,7 +2,8 @@
 require_once('../../config/database.php');
 
 // Ajouter la fonction pour calculer la commission
-function calculerCommission($id_transfert) {
+function calculerCommission($id_transfert)
+{
     global $connect;
 
     // Requête SQL pour récupérer les frais du transfert spécifié
@@ -12,7 +13,7 @@ function calculerCommission($id_transfert) {
 
     // Récupérer le résultat et calculer la commission
     $result = $req->fetch();
-    
+
     // Si des frais sont trouvés, calculer la commission
     if ($result && isset($result['frais'])) {
         $frais = $result['frais'];
@@ -47,12 +48,24 @@ if (isset($_GET)) {
             foreach ($read as $data) {
                 // Récupérer les informations sur la zone associée à l'agence
                 $zone = ModeleClasse::getoneByname('id', 'zones', $data['id_zone']);
-                
+
+                // UTILISATEUR
+                $agent = 'Pas affecter';
+                $agentNumber = 'Pas affecter';
+                $reqUser = ModeleClasse::getoneByNameDesc('affectations', 'id_agence', $data['id']);
+                if ($reqUser && $reqUser['id_utilisateur']):
+                    $User = ModeleClasse::getoneByname('id', 'utilisateurs', $reqUser['id_utilisateur']) ?? [];
+                    $agent = $User['prenom'] . ' ' . $User['nom'];
+                    $agentNumber = $User['telephone'];
+                else:
+                    $reqUser = [];
+                endif;
+
                 // Récupérer les informations de transfert pour calculer la commission (exemple avec un ID de transfert fictif)
                 // Tu peux adapter cette partie pour récupérer l'ID du transfert associé à chaque agence
                 $id_transfert = 1; // Remplacer par l'ID du transfert correspondant à l'agence
                 $commissions = calculerCommission($id_transfert);
-              
+
                 // Construire l'objet agence avec les relations
                 $objet = [
                     "id" => $data["id"],
@@ -70,6 +83,9 @@ if (isset($_GET)) {
                     "created_at" => $data["created_at"] ?? null,
                     "created_by" => $data["created_by"] ?? null,
                     "updated_at" => $data["updated_at"] ?? null,
+                    // Agent
+                    "agent" => $agent,
+                    "agentNumber" => $agentNumber,
 
                     // Ajouter les commissions calculées
                     "commission_depot" => $commissions['commission_depot'],
@@ -93,4 +109,3 @@ if (isset($_GET)) {
 } else {
     echo json_encode("Aucune donnée reçue");
 }
-?>

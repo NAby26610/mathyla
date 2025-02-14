@@ -8,6 +8,7 @@ if (isset($_POST) && !empty($_POST)) {
     }
     if ($_POST['deductFrais'] == true) {
         $_POST['deductFrais'] = 1;
+        $_POST['montant'] -= $_POST['frais'];
     } else {
         $_POST['deductFrais'] = 0;
     }

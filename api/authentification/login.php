@@ -10,7 +10,7 @@ if (!empty($_POST)) :
     $response = [];
     // Essaie de te connecter
     try {
-        $userAuth = ModeleClasse::loginUser('utilisateurs', 'email', $email, 'mot_de_passe', $mot_de_passe);
+        $userAuth = ModeleClasse::loginUser('utilisateurs', 'telephone', $telephone, 'mot_de_passe', $mot_de_passe);
         if ($userAuth) :
             // Création de l'objet utilisateur avec les accès
             $Agence = ModeleClasse::getoneByNameDesc('affectations', 'id_utilisateur', $userAuth['id']);
@@ -23,7 +23,7 @@ if (!empty($_POST)) :
                 'message' => "Connexion réussi !",
                 'id_agence' => $Agence['id_agence'] ?? null,
                 'idUser' => $userAuth['id'],
-                'nomComplet' => $userAuth['nom'] . '' . $userAuth['prenom'],
+                'nomComplet' => $userAuth['prenom'] . ' ' . $userAuth['nom'],
                 'statut' => 1,
                 'privilege' => $privilege,
                 'access_token' => loginToken(32)  // Génération d'un token d'accès
@@ -34,7 +34,7 @@ if (!empty($_POST)) :
                 'message' => "Vos information ne correspondent_ pas !"
             ];
         endif;
-        echo json_encode($response, true);
+        echo json_encode($response, JSON_PRETTY_PRINT);
     } catch (\Throwable $th) {
         // Si tu n'arrive pas
         echo json_encode($th->getMessage());

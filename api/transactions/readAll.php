@@ -10,19 +10,24 @@ if (isset($_GET)) {
             foreach ($read as $data) {
                 // Récupérer les informations sur l'agence associée à la transaction
                 $agence = ModeleClasse::getoneByname('id', 'agences', $data['id_agence']);
+                $zone = ModeleClasse::getoneByname('id', 'zones', $agence['id_zone']);
+                $Affectation = ModeleClasse::getoneByNameDesc('affectations', 'id_agence', $data['id_agence']);
+                $Utilisateur = ModeleClasse::getoneByname('id', 'utilisateurs', $Affectation['id_utilisateur']);
                 
                 // Récupérer les informations sur la devise associée à la transaction
-                $devise = ModeleClasse::getoneByname('id', 'devise', $data['id_devise']);
+                $devise = ModeleClasse::getoneByname('id', 'devise', $zone['id_devise']);
                 
                 // Construire un objet pour la transaction avec les informations sur l'agence et la devise
                 $objet = [
                     "id" => $data["id"],
                     "transaction" => [
-                        "montant" => $data["montant"] ?? 0,
+                        "id" => $data["id"] ?? null,
+                        "montant" => formatNumber2($data["montant"]) ?? 0,
                         "typeTransaction" => $data["typeTransaction"] ?? null,
                         "created_at" => $data["created_at"] ?? null,
                         "created_by" => $data["created_by"] ?? null,
                         "updated_at" => $data["updated_at"] ?? null,
+                        'Utilisateur' => $Utilisateur['prenom'] . ' ' . $Utilisateur['nom'],
                        
                         "agence" => [
                             "id_agence" => $agence["id"] ?? null,  // ID de l'agence associée
@@ -48,7 +53,6 @@ if (isset($_GET)) {
                         
                     ],
                 ];
-
                 // Ajouter l'objet construit à la liste des transactions
                 array_push($datatransactions, $objet);
             }

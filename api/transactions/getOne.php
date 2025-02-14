@@ -19,7 +19,6 @@ if (isset($_GET['id'])) {
                 "created_at" => $transaction["created_at"],
                 "created_by" => $transaction["created_by"],
                 "updated_at" => $transaction["updated_at"],
-                
             ];
 
             // Retourner l'objet transaction sous forme de JSON

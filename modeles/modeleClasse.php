@@ -14,7 +14,7 @@ class ModeleClasse
     static function getallGROUP($table, $key)
     {
         global $connect;
-        $req = $connect->query("SELECT * FROM " . $table . " GROUP BY ". $key);
+        $req = $connect->query("SELECT * FROM " . $table . " GROUP BY " . $key);
         $result = $req->fetchAll();
         return $result;
     }
@@ -23,7 +23,7 @@ class ModeleClasse
     static function getallGROUP_clause($table, $name, $value, $key)
     {
         global $connect;
-        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name . "= ?" . " GROUP BY ". $key);
+        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name . "= ?" . " GROUP BY " . $key);
         $req->execute([$value]);
         $result = $req->fetchAll();
         return $result;
@@ -45,7 +45,7 @@ class ModeleClasse
         $result = $req->fetchAll();
         return $result;
     }
-    
+
     // GeallByName egality
     static function getallbyName($table, $name, $value)
     {
@@ -55,7 +55,7 @@ class ModeleClasse
         $result = $req->fetchAll();
         return $result;
     }
-    
+
     // GeallByName egality
     static function getallbyNameSUM($table, $name, $value, $clause)
     {
@@ -70,7 +70,7 @@ class ModeleClasse
     static function getallbyNameSUM2Clause($table, $name, $value, $clause, $champ, $val)
     {
         global $connect;
-        $req = $connect->prepare("SELECT *, SUM($clause) FROM " . $table . " WHERE " . $name . "= ? AND ".$champ. "= ?");
+        $req = $connect->prepare("SELECT *, SUM($clause) FROM " . $table . " WHERE " . $name . "= ? AND " . $champ . "= ?");
         $req->execute([$value, $val]);
         $result = $req->fetchAll();
         return $result;
@@ -80,17 +80,17 @@ class ModeleClasse
     static function getallbyName2Clause($table, $name, $value1, $name2, $value2)
     {
         global $connect;
-        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name . "= ? AND ".$name2. "= ? ");
+        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name . "= ? AND " . $name2 . "= ? ");
         $req->execute([$value1, $value2]);
         $result = $req->fetchAll();
         return $result;
     }
 
     // GeallByName egality (Inter)
-    static function getallbyName2ClauseIntervalle($table, $name, $value1, $name2, $value2,$operateur1,$operateur2)
+    static function getallbyName2ClauseIntervalle($table, $name, $value1, $name2, $value2, $operateur1, $operateur2)
     {
         global $connect;
-        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name .$operateur1." ? AND ".$name2. $operateur2 ." ? ");
+        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name . $operateur1 . " ? AND " . $name2 . $operateur2 . " ? ");
         $req->execute([$value1, $value2]);
         $result = $req->fetchAll();
         return $result;
@@ -101,7 +101,7 @@ class ModeleClasse
     static function getallbyNameIntervall_($table, $name1, $value1, $name2, $value2, $clause, $val)
     {
         global $connect;
-        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name1 . ">= ? AND ".$name2. "<= ? AND ".$clause. "= ?");
+        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name1 . ">= ? AND " . $name2 . "<= ? AND " . $clause . "= ?");
         $req->execute([$value1, $value2, $val]);
         $result = $req->fetchAll();
         return $result;
@@ -112,7 +112,7 @@ class ModeleClasse
     static function getallbyNameIntervall($table, $name1, $value1, $name2, $value2)
     {
         global $connect;
-        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name1 . ">= ? AND ".$name2. "<= ? ");
+        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name1 . ">= ? AND " . $name2 . "<= ? ");
         $req->execute([$value1, $value2]);
         $result = $req->fetchAll();
         return $result;
@@ -171,7 +171,7 @@ class ModeleClasse
     static function getallJoin_clause2Where($tablepk, $pk, $tablefk, $fk, $champ, $val)
     {
         global $connect;
-        $req = $connect->query("SELECT *, $tablepk.created_at FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk." AND ".$champ."=".$val);
+        $req = $connect->query("SELECT *, $tablepk.created_at FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk . " AND " . $champ . "=" . $val);
         $result = $req->fetchAll();
         return $result;
     }
@@ -180,16 +180,16 @@ class ModeleClasse
     static function getallJoin_clause2($tablepk, $pk, $tablefk, $fk, $champ, $val)
     {
         global $connect;
-        $req = $connect->query("SELECT * FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk." AND ".$champ."=".$val);
+        $req = $connect->query("SELECT * FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk . " AND " . $champ . "=" . $val);
         $result = $req->fetchAll();
         return $result;
     }
-    
+
     // Jointure condition CAISSE_FOURNISSEUR
     static function getallJoin_clause2Where_($tablepk, $pk, $tablefk, $fk, $champ, $val)
     {
         global $connect;
-        $req = $connect->query("SELECT *, $tablepk.created_at FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk." AND ".$champ."=".$val);
+        $req = $connect->query("SELECT *, $tablepk.created_at FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk . " AND " . $champ . "=" . $val);
         $result = $req->fetchAll();
         return $result;
     }
@@ -198,7 +198,7 @@ class ModeleClasse
     static function getallJoin_clause2WhereItem($tablepk, $pk, $tablefk, $fk, $champ, $val, $group)
     {
         global $connect;
-        $req = $connect->query("SELECT *, $tablepk.created_at FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk." AND ".$champ."=".$val." GROUP BY ".$group);
+        $req = $connect->query("SELECT *, $tablepk.created_at FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk . " AND " . $champ . "=" . $val . " GROUP BY " . $group);
         $result = $req->fetchAll();
         return $result;
     }
@@ -209,7 +209,7 @@ class ModeleClasse
     static function getallJoin_clause_OrderbyID($tablepk, $pk, $tablefk, $fk)
     {
         global $connect;
-        $req = $connect->query("SELECT * FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk." ORDER BY ". $tablepk . ".id DESC");
+        $req = $connect->query("SELECT * FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk . " ORDER BY " . $tablepk . ".id DESC");
         $result = $req->fetchAll();
         return $result;
     }
@@ -218,7 +218,7 @@ class ModeleClasse
     static function getallJoin_clause2WhereSum($tablepk, $pk, $tablefk, $fk, $champ, $val, $group, $sum)
     {
         global $connect;
-        $req = $connect->query("SELECT *, SUM($sum) FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk." AND ".$champ."=".$val." GROUP BY ".$group);
+        $req = $connect->query("SELECT *, SUM($sum) FROM " . $tablepk . " INNER JOIN " . $tablefk . " WHERE " . $tablepk . "." . $pk . "=" . $tablefk . "." . $fk . " AND " . $champ . "=" . $val . " GROUP BY " . $group);
         $result = $req->fetchAll();
         return $result;
     }
@@ -277,7 +277,7 @@ class ModeleClasse
     static function deleteClause($clause, $value, $table)
     {
         global $connect;
-        $connect->query("DELETE FROM " . $table . " WHERE " . $clause . "= ".$value);
+        $connect->query("DELETE FROM " . $table . " WHERE " . $clause . "= " . $value);
     }
 
     // UPDATE SIMPLE
@@ -360,139 +360,142 @@ class ModeleClasse
         $req->execute($dat);
     }
     // Fonction pour calculer la somme de la colonne spécifiée
-static function getallbyNameSUMO($table, $name, $value, $clause)
-{
-    global $connect;
-    // Préparer la requête SQL pour calculer la somme
-    $req = $connect->prepare("SELECT SUM($clause) AS total FROM " . $table . " WHERE " . $name . "= ?");
-    $req->execute([$value]);
-
-    // Récupérer la première ligne de résultats (ici, ce sera uniquement la somme)
-    $result = $req->fetch();
-
-    // Retourner la somme de la colonne
-    return $result['total'] ?? 0;  // Retourne 0 si aucune somme n'est trouvée
-}
-static function getallSUMCOLONNE($table, $var)
-{
-    global $connect;
-    // Modifier la requête pour obtenir uniquement la somme
-    $req = $connect->query("SELECT SUM($var) AS total FROM " . $table);
-    
-    // Récupérer le résultat, qui contiendra uniquement la somme
-    $result = $req->fetch();
-    
-    // Retourner la somme (si elle existe, sinon retourner 0)
-    return $result['total'] ?? 0;
-}
-
-static function getTotalParJour($table, $name, $value, $clause)
-{
-    global $connect;
-    // Requête SQL pour calculer le total des montants en fonction de la date du jour et des autres critères
-    $req = $connect->prepare("SELECT SUM($clause) AS total FROM " . $table . " WHERE " . $name . "= ? AND DATE(created_at) = CURDATE()");
-    $req->execute([$value]);
-    
-    // Récupérer le résultat de la somme
-    $result = $req->fetch();
-    
-    return $result['total'] ?? 0;  // Si aucun résultat, retourne 0
-}
-static function getTotalJournalier($table, $var)
-{
-    global $connect;
-    // Modifier la requête pour obtenir la somme du montant spécifique pour la date du jour
-    $req = $connect->prepare("SELECT SUM($var) AS total FROM " . $table . " WHERE DATE(created_at) = CURDATE()");
-    $req->execute();
-    
-    // Récupérer le résultat de la somme
-    $result = $req->fetch();
-    
-    // Retourner la somme (si elle existe, sinon retourner 0)
-    return $result['total'] ?? 0; 
-}
-
-static function getNombreProprietesDisponibles() {
-    global $connect;
-    
-    // Requête SQL pour récupérer le nombre de propriétés disponibles
-    $req = $connect->query("SELECT COUNT(*) AS total FROM proprietes WHERE statut = 'disponible'");
-    
-    // Récupérer le résultat et retourner la somme
-    $result = $req->fetch();
-    
-    // Retourner le nombre de propriétés disponibles (0 si aucune donnée)
-    return $result['total'] ?? 0;
-}
-
-
-static function getNombreProprietesTotal()
-{
-global $connect;
-// Requête pour obtenir le nombre total de propriétés
-$req = $connect->query("SELECT COUNT(*) AS total FROM proprietes");
-
-// Récupérer le résultat
-$result = $req->fetch();
-
-// Retourner le total (si il existe, sinon retourner 0)
-return $result['total'] ?? 0;
-}
-
-static function getNombreReservationsTotal()
-{
-global $connect;
-// Requête pour obtenir le nombre total de réservations
-$req = $connect->query("SELECT COUNT(*) AS total FROM reservations");
-
-// Récupérer le résultat
-$result = $req->fetch();
-
-// Retourner le total (si il existe, sinon retourner 0)
-return $result['total'] ?? 0;
-}
-
-
-static function calculerCommission($id_transfert) {
-    global $connect;
-
-    // Requête SQL pour récupérer les frais du transfert spécifié
-    $req = $connect->prepare("SELECT frais FROM transfert WHERE id = :id_transfert");
-    $req->bindParam(':id_transfert', $id_transfert, PDO::PARAM_INT);
-    $req->execute();
-
-    // Récupérer le résultat et calculer la commission
-    $result = $req->fetch();
-    
-    // Si des frais sont trouvés, calculer la commission
-    if ($result && isset($result['frais'])) {
-        $frais = $result['frais'];
-
-        // Calcul des commissions
-        $commissionDepot = $frais * 0.35; // 35% pour le dépôt
-        $commissionRetrait = $frais * 0.35; // 35% pour le retrait
-        $commissionagence = $frais * 0.30; // 30% pour l'agence
-
-        // Retourner un tableau avec les différentes commissions
-        return [
-            'commission_depot' => $commissionDepot,
-            'commission_retrait' => $commissionRetrait,
-            'commission_agence' => $commissionagence
-        ];
-    } else {
-        // Si aucun frais n'est trouvé, retourner un tableau avec 0
-        return [
-            'commission_depot' => 0,
-            'commission_retrait' => 0,
-            'commission_agence' => 0
-        ];
-    }
-}
-
-
-    public static function getSoldeAgence($id_agence) {
+    static function getallbyNameSUMO($table, $name, $value, $clause)
+    {
         global $connect;
-        
+        // Préparer la requête SQL pour calculer la somme
+        $req = $connect->prepare("SELECT SUM($clause) AS total FROM " . $table . " WHERE " . $name . "= ?");
+        $req->execute([$value]);
+
+        // Récupérer la première ligne de résultats (ici, ce sera uniquement la somme)
+        $result = $req->fetch();
+
+        // Retourner la somme de la colonne
+        return $result['total'] ?? 0;  // Retourne 0 si aucune somme n'est trouvée
+    }
+    static function getallSUMCOLONNE($table, $var)
+    {
+        global $connect;
+        // Modifier la requête pour obtenir uniquement la somme
+        $req = $connect->query("SELECT SUM($var) AS total FROM " . $table);
+
+        // Récupérer le résultat, qui contiendra uniquement la somme
+        $result = $req->fetch();
+
+        // Retourner la somme (si elle existe, sinon retourner 0)
+        return $result['total'] ?? 0;
+    }
+
+    static function getTotalParJour($table, $name, $value, $clause)
+    {
+        global $connect;
+        // Requête SQL pour calculer le total des montants en fonction de la date du jour et des autres critères
+        $req = $connect->prepare("SELECT SUM($clause) AS total FROM " . $table . " WHERE " . $name . "= ? AND DATE(created_at) = CURDATE()");
+        $req->execute([$value]);
+
+        // Récupérer le résultat de la somme
+        $result = $req->fetch();
+
+        return $result['total'] ?? 0;  // Si aucun résultat, retourne 0
+    }
+    static function getTotalJournalier($table, $var)
+    {
+        global $connect;
+        // Modifier la requête pour obtenir la somme du montant spécifique pour la date du jour
+        $req = $connect->prepare("SELECT SUM($var) AS total FROM " . $table . " WHERE DATE(created_at) = CURDATE()");
+        $req->execute();
+
+        // Récupérer le résultat de la somme
+        $result = $req->fetch();
+
+        // Retourner la somme (si elle existe, sinon retourner 0)
+        return $result['total'] ?? 0;
+    }
+
+    static function getNombreProprietesDisponibles()
+    {
+        global $connect;
+
+        // Requête SQL pour récupérer le nombre de propriétés disponibles
+        $req = $connect->query("SELECT COUNT(*) AS total FROM proprietes WHERE statut = 'disponible'");
+
+        // Récupérer le résultat et retourner la somme
+        $result = $req->fetch();
+
+        // Retourner le nombre de propriétés disponibles (0 si aucune donnée)
+        return $result['total'] ?? 0;
+    }
+
+
+    static function getNombreProprietesTotal()
+    {
+        global $connect;
+        // Requête pour obtenir le nombre total de propriétés
+        $req = $connect->query("SELECT COUNT(*) AS total FROM proprietes");
+
+        // Récupérer le résultat
+        $result = $req->fetch();
+
+        // Retourner le total (si il existe, sinon retourner 0)
+        return $result['total'] ?? 0;
+    }
+
+    static function getNombreReservationsTotal()
+    {
+        global $connect;
+        // Requête pour obtenir le nombre total de réservations
+        $req = $connect->query("SELECT COUNT(*) AS total FROM reservations");
+
+        // Récupérer le résultat
+        $result = $req->fetch();
+
+        // Retourner le total (si il existe, sinon retourner 0)
+        return $result['total'] ?? 0;
+    }
+
+
+    static function calculerCommission($id_transfert)
+    {
+        global $connect;
+
+        // Requête SQL pour récupérer les frais du transfert spécifié
+        $req = $connect->prepare("SELECT frais FROM transfert WHERE id = :id_transfert");
+        $req->bindParam(':id_transfert', $id_transfert, PDO::PARAM_INT);
+        $req->execute();
+
+        // Récupérer le résultat et calculer la commission
+        $result = $req->fetch();
+
+        // Si des frais sont trouvés, calculer la commission
+        if ($result && isset($result['frais'])) {
+            $frais = $result['frais'];
+
+            // Calcul des commissions
+            $commissionDepot = $frais * 0.35; // 35% pour le dépôt
+            $commissionRetrait = $frais * 0.35; // 35% pour le retrait
+            $commissionagence = $frais * 0.30; // 30% pour l'agence
+
+            // Retourner un tableau avec les différentes commissions
+            return [
+                'commission_depot' => $commissionDepot,
+                'commission_retrait' => $commissionRetrait,
+                'commission_agence' => $commissionagence
+            ];
+        } else {
+            // Si aucun frais n'est trouvé, retourner un tableau avec 0
+            return [
+                'commission_depot' => 0,
+                'commission_retrait' => 0,
+                'commission_agence' => 0
+            ];
+        }
+    }
+
+
+    public static function getSoldeAgence($id_agence)
+    {
+        global $connect;
+
         try {
             $req = $connect->prepare("SELECT soldeInitial FROM agences WHERE id = :id_agence");
             $req->bindParam(':id_agence', $id_agence, PDO::PARAM_INT);
@@ -504,7 +507,4 @@ static function calculerCommission($id_transfert) {
             return 0; // En cas d'erreur, retourne 0
         }
     }
-
-
-
 }

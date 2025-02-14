@@ -5,13 +5,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Response de caisse
     $response = [];
     extract($_GET);
-    $_SOLDE = 0;
 
     // echo json_encode($_GET);
-    // exit;
+    // return;
+
     try {
 
-        $affectationUser = ModeleClasse::getoneByname('id_utilisateur', 'affectations', $id);
+        $affectationUser = ModeleClasse::getoneByname('id_utilisateur', 'affectations', $id_user);
         $agenceUser = ModeleClasse::getoneByname('id', 'agences', $affectationUser['id_agence']);
         $zoneUser = ModeleClasse::getoneByname('id', 'zones', $agenceUser['id_zone']);
         $deviseUser = ModeleClasse::getoneByname('id', 'devise', $zoneUser['id_devise']);
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $libelleDeviseUser = $deviseUser['libelle'];
 
         // Envoie
-        $Envoie = ModeleClasse::getallbyName('transfert', 'created_by', $id);
+        $Envoie = ModeleClasse::getallbyName('transfert', 'created_by', $id_user);
         $dataEnvoie = [];
         $montantEnvoie = 0;
         $gainsEnvoie = 0;
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             'gains' => formatNumber2($gainsEnvoie) . ' ' . $libelleDeviseUser,
         ];
         // Retrait
-        $Retrait = ModeleClasse::getallbyName('transfert', 'modify_by', $id);
+        $Retrait = ModeleClasse::getallbyName('transfert', 'modify_by', $id_user);
         $dataRetrait = [];
         $montantRetrait = 0;
         $gainsRetrait = 0;
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
         // Transfert de fond | ENTRANT
-        $F_ET = ModeleClasse::getallbyName('transfert_fond', 'modify_by', $id);
+        $F_ET = ModeleClasse::getallbyName('transfert_fond', 'modify_by', $id_user);
         $dataF_ET = [];
         $montantEntrant = 0;
         foreach ($F_ET as $fond1):
@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
         // Transfert de fond | SORTANT
-        $F_ST = ModeleClasse::getallbyName('transfert_fond', 'id_agenceSource',$agenceUser['id']);
+        $F_ST = ModeleClasse::getallbyName('transfert_fond', 'id_agenceSource', $id_agence);
         $dataF_ST = [];
         $montantSortant = 0;
         foreach ($F_ST as $fond2):
@@ -92,35 +92,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         ];
 
         // Transaction | AUTRES-DEPENSES
-        $Transaction = ModeleClasse::getallbyName('transactions', 'id_agence',$agenceUser['id']);
+        $Transaction = ModeleClasse::getallbyName('transactions', 'id_agence', $id_agence);
         $dataTransac = [];
         $Encaissement = 0;
         $Decaissement = 0;
-        $gainsRetirer = 0; // GAINS RETRAIT
         foreach ($Transaction as $data):
             $Type = ModeleClasse::getoneByname('id', 'type_depenses', $data['typeTransaction']);
-            if ($data['statut_transaction'] == 'confirmer'):
-                if ($data['typeTransaction'] == 1) //  Encaissement
-                    $Encaissement += $data['montant'];
-                elseif ($data['typeTransaction'] == 0) // Decaissement
-                    $Decaissement += $data['montant'];
-                elseif ($data['typeTransaction'] == -1) // RETRAIT DE GAINS
-                    $gainsRetirer += $data['montant'];
-            endif;
+            if ($data['typeTransaction'] == 1) //  Encaissement
+                $Encaissement += $data['montant'];
+            elseif ($data['typeTransaction'] == 0) // Decaissement
+                $Decaissement += $data['montant'];
         endforeach;
         $dataTransac = [
             'Encaissement' => formatNumber2($Encaissement) . ' ' . $libelleDeviseUser,
             'Decaissement' => formatNumber2($Decaissement) . ' ' . $libelleDeviseUser,
         ];
 
+        $_SOLDE = 0;
+        // CALCULE DU SOLDE
+        $_SOLDE = (($montantEnvoie + $gainsEnvoie + $montantEntrant + $Encaissement) - ($montantRetrait + $montantSortant + $Decaissement));
+        // CALCULE DU SOLDE
         $response = array(
-            'dataEnvoie' => $dataEnvoie,
-            'dataRetrait' => $dataRetrait,
-            'fondEntrant' => $dataF_ET,
-            'fondSortant' => $dataF_ST,
+            'dataEnvoie' => $dataEnvoie ?? [],
+            'dataRetrait' => $dataRetrait ?? [],
+            'fondEntrant' => $dataF_ET ?? [],
+            'fondSortant' => $dataF_ST ?? [],
             'gainsTotal' => formatNumber2($gainsEnvoie + $gainsRetrait) . ' ' . $libelleDeviseUser,
-            'gainsRetirer' => formatNumber2($gainsRetirer) . ' ' . $libelleDeviseUser,
-            'transaction' => $dataTransac,
+            'transaction' => $dataTransac ?? [],
             'soldeReel' => formatNumber2($_SOLDE) . ' ' . $libelleDeviseUser,
         );
 

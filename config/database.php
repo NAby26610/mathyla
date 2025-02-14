@@ -13,6 +13,14 @@ header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Ac
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 
+// PRODUCTION
+// try {
+//     $connect = new PDO('mysql:host=ep5ykc.myd.infomaniak.com;dbname=ep5ykc_matyla_transfert', 'ep5ykc_SPA-DEV', 'KonindouSpa01-DB');
+// } catch (Exception $e) {
+//     die('Erreur  de connexion  : ' . $e->getMessage());
+// }
+
+// DEVELOPPEMENT
 try {
     $connect = new PDO('mysql:host=localhost;dbname=db_mathyla', 'root', '');
 } catch (Exception $e) {
