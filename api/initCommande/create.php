@@ -7,17 +7,17 @@ if (isset($_POST) && !empty($_POST)) {
         $_POST[$key] = str_secure($value);
     }
     extract($_POST);
-    $table = $_POST['table'];
-    unset($_POST['table']);
+    $initCommande = $_POST['initCommande'];
+    unset($_POST['initCommande']);
 
     try {
-        // Creation d'une table
+        // Creation d'une initCommande
         
-            $ajout_partenaire = ModeleClasse::add(" $table", $_POST);
-            if (!$ajout_partenaire) {
-                $message = "table ajouté avec succès.";
+            $ajout_partenaire = ModeleClasse::add(" $initCommande", $_POST);
+            if ($ajout_partenaire) {
+                $message = "initCommande ajouté avec succès.";
             } else {
-                $message = "Échec de l'ajout de table.";
+                $message = "Échec de l'ajout de initCommande.";
             }
       
     } catch (\Throwable $th) {

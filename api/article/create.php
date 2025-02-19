@@ -7,17 +7,17 @@ if (isset($_POST) && !empty($_POST)) {
         $_POST[$key] = str_secure($value);
     }
     extract($_POST);
-    $table = $_POST['table'];
-    unset($_POST['table']);
+    $article = $_POST['article'];
+    unset($_POST['article']);
 
     try {
-        // Creation d'une table
+        // Creation d'une article
         
-            $ajout_partenaire = ModeleClasse::add(" $table", $_POST);
-            if (!$ajout_partenaire) {
-                $message = "table ajouté avec succès.";
+            $ajout_partenaire = ModeleClasse::add(" $article", $_POST);
+            if ($ajout_partenaire) {
+                $message = "article ajouté avec succès.";
             } else {
-                $message = "Échec de l'ajout de table.";
+                $message = "Échec de l'ajout de article.";
             }
       
     } catch (\Throwable $th) {
