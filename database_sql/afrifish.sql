@@ -22,29 +22,12 @@ CREATE TABLE utilisateur (
 CREATE TABLE entite (
   id INT AUTO_INCREMENT PRIMARY KEY,
   reference VARCHAR(50) NOT NULL,
-  libelle VARCHAR(150) NOT NULL,
   codeEntite VARCHAR(50) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   created_by INT DEFAULT NULL,
   modify_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   modify_by INT DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DELIMITER $$
-
-CREATE TRIGGER before_insert_entite
-BEFORE INSERT ON entite
-FOR EACH ROW
-BEGIN
-    SET NEW.codeEntite = CONCAT(
-        UPPER(SUBSTRING(MD5(RAND()), 1, 4)),
-        LPAD(FLOOR(RAND() * 10000), 4, '0'),
-        UPPER(SUBSTRING(MD5(NOW()), 1, 2))
-    );
-END $$
-
-DELIMITER ;
-
 -- Table des affectations
 CREATE TABLE affectation (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -156,6 +139,21 @@ CREATE TABLE article (
   modify_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   modify_by INT DEFAULT NULL,
   FOREIGN KEY (id_categorie) REFERENCES categorie(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table des paniers de commande
+CREATE TABLE panierCommande (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_initCommande INT DEFAULT NULL,
+  id_article INT DEFAULT NULL,
+  quantite DECIMAL(15,2) NOT NULL CHECK (quantite > 0),
+  statut ENUM ('en cours','terminer') NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_by INT DEFAULT NULL,
+  modify_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  modify_by INT DEFAULT NULL,
+  FOREIGN KEY (id_initCommande) REFERENCES initCommande(id) ON DELETE CASCADE,
+  FOREIGN KEY (id_article) REFERENCES article(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Table des paniers de vente

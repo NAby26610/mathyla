@@ -16,8 +16,7 @@ if (isset($_GET)) {
                     "id" => $data["id"],
                     "id_entite" => $entite["id"],
                     "libelle" => $data["libelle"],
-                    "entite_libelle" => $entite["libelle"],  // Changement du nom de la clé pour éviter la duplication
-                    "reference" => $entite["reference"] ?? null, 
+                    "entite" => $entite["reference"] ?? null, 
                     "codeEntite" => $entite["codeEntite"] ?? null,
                     "created_at" => $data["created_at"] ?? null,  // Date de création du categorie
                     "created_by" => $data["created_by"] ?? null,

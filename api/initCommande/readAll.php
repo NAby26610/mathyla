@@ -2,21 +2,28 @@
 require_once('../../config/database.php');
 
 if (isset($_GET)) {
-    $datainitCommandes = [];  // Initialisation du tableau vide
+    $response = [];  // Initialisation du tableau vide
     try {
         // Récupérer tous les initCommandes triés par ordre décroissant
-        $read = ModeleClasse::getallDESC("initCommande");
+        $read = ModeleClasse::getall("initCommande");
         if ($read) {
             foreach ($read as $data) {
-                // Récupérer les informations sur l'entite
+                // Récupérer les informations sur l'entité
                 $entite = ModeleClasse::getoneByname('id', 'entite', $data['id_entite']);
                 $fournisseur = ModeleClasse::getoneByname('id', 'fournisseur', $data['id_fournisseur']);
-                
+
                 // Construire un objet pour le initCommande avec les informations associées
                 $objet = [
                     "id" => $data["id"],
                     "id_entite" => $entite["id"],
+                    "entite" => $entite["reference"],
+                    "code_entite" => $entite["codeEntite"],
                     "id_fournisseur" => $fournisseur["id"],
+                    "representant" => $fournisseur["representant"],
+                    "raison_sociale" => $fournisseur["raison_sociale"],
+                    "telephone" => $fournisseur["telephone"],
+                    "adresse" => $fournisseur["adresse"],
+                    "pays" => $fournisseur["pays"],
                     "statut" => $data["statut"],
                     "created_at" => $data["created_at"] ?? null,  // Date de création du initCommande
                     "created_by" => $data["created_by"] ?? null,
@@ -24,19 +31,24 @@ if (isset($_GET)) {
                 ];
 
                 // Ajouter l'objet construit à la liste des initCommandes
-                array_push($datainitCommandes, $objet);
+                array_push($response, $objet);
             }
         } else {
-            echo json_encode('Aucun initCommande trouvé');
+            // Si aucune commande n'est trouvée
+            echo json_encode(['message' => 'Aucun initCommande trouvé']);
             exit;
         }
 
-        // Retourner les initCommandes sous forme de JSON
-        echo json_encode($datainitCommandes, true);
+        // Retourner les données sous forme de JSON
+        echo json_encode(
+            $response,
+            JSON_PRETTY_PRINT
+        );
     } catch (\Throwable $th) {
-        echo json_encode($th->getMessage());
+        // En cas d'erreur
+        echo json_encode(['error' => $th->getMessage()]);
     }
 } else {
-    echo json_encode("Aucune donnée reçue");
+    // Si aucune donnée n'est reçue
+    echo json_encode(['message' => 'Aucune donnée reçue']);
 }
-?>

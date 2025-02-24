@@ -11,7 +11,6 @@ if (isset($_GET)) {
                 $objet = [
                     "id" => $data["id"],
                     "reference" => $data["reference"],
-                    "libelle" => $data["libelle"], // Retirer l'espace ici
                     "codeEntite" => $data["codeEntite"],
                     "modify_at" => $data["modify_at"],
                     "created_at" => $data["created_at"]

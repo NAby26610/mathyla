@@ -158,3 +158,14 @@ function joursRestantsLocation($dateFinLocation)
 
     return $joursRestants;
 }
+function loginToken($length = 32)
+{
+    // Génère une chaîne binaire aléatoire
+    $randomBinaryString = openssl_random_pseudo_bytes($length);
+
+    // Convertit la chaîne binaire en une chaîne hexadécimale
+    $token = bin2hex($randomBinaryString);
+
+    return $token;
+}
+

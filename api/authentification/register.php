@@ -8,8 +8,8 @@
         $_POST['mot_de_passe'] = md5( $_POST['mot_de_passe']);
         extract($_POST);
         try {
-            $ajout = ModeleClasse::add("utilisateurs",$_POST);
-            if(!$ajout):
+           
+            if(ModeleClasse::add("utilisateur",$_POST)):
                 $message = "Enregistrer avec succes";
             else :
                 $message = "Enregistrement echoue";
