@@ -12,22 +12,26 @@ if (isset($_POST) && !empty($_POST)) {
     } else {
         $_POST['deductFrais'] = 0;
     }
+    
     // NET A RECEVOIR
     if (!empty($_POST['netARecevoir']))
         $_POST['montantRetrait'] = floatval($_POST['netARecevoir']);
     unset($_POST['netARecevoir']);
+    // CODE DU TRANSFERT
+    $_POST['codeTransfert'] = "MMS".date('dm').rand(1000, 9999);
     extract($_POST);
     try {
         $ajout = ModeleClasse::add("transfert", $_POST);
         if (!$ajout):
+            Nimba_SMS($telEnvoyeur, "BIENVENUE CHEZ MATHYLA - MULTI_SERVICE, Votre code de transfert est le : " . $_POST['codeTransfert']);
             $response = [
                 'status' => 1,
-                'message' => 'Transfert ajoutée avec succès...',
+                'message' => 'Transfert envoyer avec success...',
             ];
         else :
             $response = [
                 'status' => 0,
-                'message' => 'Échec lors du transfert.',
+                'message' => 'Echec lors du transfert.',
             ];
         endif;
         echo json_encode($response);

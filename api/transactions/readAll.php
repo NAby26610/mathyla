@@ -2,10 +2,17 @@
 require_once('../../config/database.php');
 
 if (isset($_GET)) {
+    extract($_GET);
     $datatransactions = [];
+    // echo json_encode($id);
+    // exit();
     try {
         // Récupérer toutes les transactions triées par ordre décroissant
-        $read = ModeleClasse::getallDESC("transactions");
+        if (!is_numeric($id))
+            $read = ModeleClasse::getallDESC("transactions");
+        else
+            $read = ModeleClasse::getallbyName("transactions", 'id_agence', $id);
+        
         if ($read) {
             foreach ($read as $data) {
                 // Récupérer les informations sur l'agence associée à la transaction
@@ -13,10 +20,10 @@ if (isset($_GET)) {
                 $zone = ModeleClasse::getoneByname('id', 'zones', $agence['id_zone']);
                 $Affectation = ModeleClasse::getoneByNameDesc('affectations', 'id_agence', $data['id_agence']);
                 $Utilisateur = ModeleClasse::getoneByname('id', 'utilisateurs', $Affectation['id_utilisateur']);
-                
+
                 // Récupérer les informations sur la devise associée à la transaction
                 $devise = ModeleClasse::getoneByname('id', 'devise', $zone['id_devise']);
-                
+
                 // Construire un objet pour la transaction avec les informations sur l'agence et la devise
                 $objet = [
                     "id" => $data["id"],
@@ -24,11 +31,13 @@ if (isset($_GET)) {
                         "id" => $data["id"] ?? null,
                         "montant" => formatNumber2($data["montant"]) ?? 0,
                         "typeTransaction" => $data["typeTransaction"] ?? null,
+                        "motif" => $data["motif"] ?? null,
+                        "statut" => $data["statut_transaction"] ?? null,
                         "created_at" => $data["created_at"] ?? null,
                         "created_by" => $data["created_by"] ?? null,
                         "updated_at" => $data["updated_at"] ?? null,
                         'Utilisateur' => $Utilisateur['prenom'] . ' ' . $Utilisateur['nom'],
-                       
+
                         "agence" => [
                             "id_agence" => $agence["id"] ?? null,  // ID de l'agence associée
                             "libelle" => $agence["libelle"] ?? null,  // Libellé de l'agence
@@ -44,21 +53,18 @@ if (isset($_GET)) {
                             "descriptions" => $agence["descriptions"] ?? null,
                             "created_at" => $agence["created_at"] ?? null,
                         ],
-                       
+
                         "devise" => [
                             "id_devise" => $devise["id"] ?? null,  // ID de la devise associée
                             "libelle" => $devise["libelle"] ?? null,  // Libellé de la devise
-                   
+
                         ],
-                        
+
                     ],
                 ];
                 // Ajouter l'objet construit à la liste des transactions
                 array_push($datatransactions, $objet);
             }
-        } else {
-            echo json_encode('Aucune transaction trouvée');
-            exit;
         }
 
         // Retourner les transactions sous forme de JSON
@@ -69,4 +75,3 @@ if (isset($_GET)) {
 } else {
     echo json_encode("Aucune donnée reçue");
 }
-?>

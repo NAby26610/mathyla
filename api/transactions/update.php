@@ -7,7 +7,7 @@ if (!empty($_POST) && isset($_POST['id'])) {
     try {
         extract($_POST);
 
-        if (ModeleClasse::update('transactions', $_POST, $id)) {
+        if (!ModeleClasse::update('transactions', $_POST, $id)) {
             $reponse = [
                 'status' => 1,
                 'message' => "Mise à jour effectuée avec succès"

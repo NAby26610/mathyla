@@ -46,10 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $OBJET = [
                     'id' => $r['id'],
                     'created_at' => $r['created_at'],
-                    'libelle' => 'Retrait d\'argent',
+                    'libelle' => 'Envoie d\'argent',
                     'Agence' => $AgenceUser['libelle'],
-                    'montantRetrait' => formatNumber2($r['montant']),
+                    'montantEnvoie' => formatNumber2($r['montant']),
                     'frais' => formatNumber2($r['frais']),
+                    'montant_et_frais' => formatNumber2($r['montant'] + $r['frais']),
                     'gains' => ($gainsRetrait),
                     'statut' => $r['statut'],
                 ];

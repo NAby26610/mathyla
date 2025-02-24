@@ -64,7 +64,9 @@ if (isset($_POST) && !empty($_POST)) {
             ]);
 
             if (!$ajout) {
+                $message_ = 'Bonjour, ' . $utilisateurExistant['prenom'] . ' ' . $utilisateurExistant['nom'] . ', Votre compte en tant que gerant a ete creer chez Mathyla-Transfert, connectez-vous a l\'adresse : https://matyla.spa-dev.com) avec les access suivant : ' . $utilisateurExistant['telephone'] . ' | MPD: 1234';
                 // $message = "Affectation ajoutée avec succès.";
+                Nimba_SMS($utilisateurExistant['telephone'], $message_);
                 $response = [
                     'status' => 1,
                     'message' => 'Affectation ajoutée avec succès...',

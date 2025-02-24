@@ -8,8 +8,8 @@ if (isset($_POST) && !empty($_POST)) {
     }
 
     // Sécurisation et hachage du mot de passe
-    $_POST['mot_de_passe'] = md5("MMS-1234");
-    $_POST['codePin'] = md5("MMS-1234");
+    $_POST['mot_de_passe'] = md5("1234");
+    $_POST['codePin'] = md5("1234");
     extract($_POST);
 
     $response = [];
@@ -17,12 +17,19 @@ if (isset($_POST) && !empty($_POST)) {
     // Vérification si l'email existe déjà
     try {
         $existingEmail = ModeleClasse::getoneByname('email', 'utilisateurs', $email);
+        $existingPhone = ModeleClasse::getoneByname('telephone', 'utilisateurs', $telephone);
 
         if ($existingEmail) {
             // Si l'email existe déjà, on renvoie un message d'erreur
             $response = [
                 'status' => 0,
                 'message' => 'Un utilisateur avec cet e-mail existe déjà.',
+            ];
+        } elseif ($existingPhone) {
+            // Si l'email existe déjà, on renvoie un message d'erreur
+            $response = [
+                'status' => 0,
+                'message' => 'Un utilisateur avec cet numero existe déjà.',
             ];
         } else {
             // Si l'email n'existe pas, on procède à l'ajout

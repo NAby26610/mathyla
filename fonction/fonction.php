@@ -19,6 +19,16 @@ function dateConvert($votre_date)
         return $e->getMessage(); // Gérer les erreurs si la date est invalide
     }
 }
+function dateConvertMois($votre_date)
+{
+    try {
+        $timezone = new DateTimeZone('GMT');
+        $date = new DateTime($votre_date, $timezone);
+        return $date->format('Y-m');
+    } catch (Exception $e) {
+        return $e->getMessage(); // Gérer les erreurs si la date est invalide
+    }
+}
 
 // Generation du Token d'Auth
 function generateToken_($userId)
@@ -59,6 +69,37 @@ function _Aujourdhui()
     // Afficher la date
     return $date_format;
 }
+
+function CE_MOIS()
+{
+    // Définir le fuseau horaire GMT+00
+    $timezone = new DateTimeZone('GMT');
+
+    // Créer une nouvelle instance de DateTime avec le fuseau horaire défini
+    $date = new DateTime('now', $timezone);
+
+    // Formater la date selon votre besoin
+    $date_format = $date->format('Y-m');
+
+    // Afficher la date
+    return $date_format;
+}
+
+function _Hier()
+{
+    // Définir le fuseau horaire GMT+00
+    $timezone = new DateTimeZone('GMT');
+
+    // Créer une nouvelle instance de DateTime avec le fuseau horaire défini
+    $date = new DateTime('now', $timezone);
+
+    // Soustraire un jour
+    $date->modify('-1 day');
+
+    // Formater la date selon votre besoin
+    return $date->format('Y-m-d');
+}
+
 
 function obtenirDateHeureActuelles()
 {
@@ -195,4 +236,48 @@ function joursRestantsLocation($dateFinLocation)
     $joursRestants = ceil($difference / (60 * 60 * 24));
 
     return $joursRestants;
+}
+
+
+
+
+
+// NIMBA SMS DOCUMENTATION FONCTION
+function Nimba_SMS($phoneNumber, $sms_)
+{
+    $url = "https://api.nimbasms.com/v1/messages";
+
+    $headers = array(
+        "Authorization: Basic ZDQxNjgxOWNhMzg0MDNmMjM3OGExYmZmOGY4N2I4YTc6SnJhM0V3YnlWOVpuVkR1SW1pNktkUFhCZWRLSklKQU1tLTBuSFJaN2dNejJnT1JVa1l5TUlzTkVfTzhxYWtFQUdPUFRDNTVON2EyZDMyd21LZkk2c2pjWEZTZDVOcGc1RUwybF9GTnZ0U2M=",
+        "Content-Type: application/json"
+    );
+
+    $body = array(
+        "to" => array('+224' . $phoneNumber),
+        "sender_name" => "SMS 9080",
+        "message" => $sms_
+    );
+
+    $ch = curl_init($url);
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+
+    if (curl_errno($ch)) {
+        return curl_error($ch);
+    } else {
+        $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($status_code == 201) {
+            return $response;
+        } else {
+            return $response;
+        }
+    }
+
+    curl_close($ch);
 }

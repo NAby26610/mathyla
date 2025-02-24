@@ -10,7 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // echo json_encode($_GET);
     // exit;
     try {
-
+        // SESSION
+        $Session = ModeleClasse::getoneByname('id', 'utilisateurs', $id);
         $affectationUser = ModeleClasse::getoneByname('id_utilisateur', 'affectations', $id);
         $agenceUser = ModeleClasse::getoneByname('id', 'agences', $affectationUser['id_agence']);
         $zoneUser = ModeleClasse::getoneByname('id', 'zones', $agenceUser['id_zone']);
@@ -25,7 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $gainsEnvoie = 0;
         foreach ($Envoie as $e):
             // ----------------------------------------------------------------
-            $montantEnvoie += $e['montant'];
+            if ($e['deductFrais'] == 0)
+                $montantEnvoie += $e['montant'] + $e['frais'];
+            else
+                $montantEnvoie += $e['montant'];
             // Calcul du gains
             $gainsEnvoie += ($e['frais'] * 35) / 100;
         endforeach;
@@ -79,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
         // Transfert de fond | SORTANT
-        $F_ST = ModeleClasse::getallbyName('transfert_fond', 'id_agenceSource',$agenceUser['id']);
+        $F_ST = ModeleClasse::getallbyName('transfert_fond', 'id_agenceSource', $agenceUser['id']);
         $dataF_ST = [];
         $montantSortant = 0;
         foreach ($F_ST as $fond2):
@@ -92,14 +96,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         ];
 
         // Transaction | AUTRES-DEPENSES
-        $Transaction = ModeleClasse::getallbyName('transactions', 'id_agence',$agenceUser['id']);
+        $Transaction = ModeleClasse::getallbyName('transactions', 'id_agence', $agenceUser['id']);
         $dataTransac = [];
         $Encaissement = 0;
         $Decaissement = 0;
         $gainsRetirer = 0; // GAINS RETRAIT
         foreach ($Transaction as $data):
             $Type = ModeleClasse::getoneByname('id', 'type_depenses', $data['typeTransaction']);
-            if ($data['statut_transaction'] == 'confirmer'):
+            if ($data['statut_transaction'] == 'valider'):
                 if ($data['typeTransaction'] == 1) //  Encaissement
                     $Encaissement += $data['montant'];
                 elseif ($data['typeTransaction'] == 0) // Decaissement

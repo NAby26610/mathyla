@@ -9,9 +9,9 @@ if (isset($_GET['id'])) {
         $agence = ModeleClasse::getone("agences", $agenceId);
         $infoAgence = [];
         $operations = [];
-        
+
         $Affectation = ModeleClasse::getoneByNameDesc('affectations', 'id_agence', $agenceId);
-        $_SOLDE = $Affectation['soldeOuverture'];
+        $_SOLDE = $Affectation['soldeOuverture'] + $agence['soldeInitial'];
 
         if ($agence):
             // Récupérer les informations de la zone associée à l'agence
@@ -43,14 +43,14 @@ if (isset($_GET['id'])) {
                     'statut' => $data["statut"],
                 ];
                 array_push($operations, $_Envoie);
-                if ($data['deductFrais'] == 1)
-                    $_SOLDE += $data['montant'];
-                elseif ($data['deductFrais'] == 0)
-                    $_SOLDE += $data['montant'] + $data['montant'];
+                // if ($data['deductFrais'] == 1)
+                //     $_SOLDE += $data['montant'];
+                // elseif ($data['deductFrais'] == 0)
+                $_SOLDE += $data['montant'] + $data['frais'];
             endforeach;
 
             // Récupérer le transfert spécifique par son ID (RETRAIT)
-            $Retrait = ModeleClasse::getallbyName("transfert", 'modify_by', $Affectation['id']);
+            $Retrait = ModeleClasse::getallbyName("transfert", 'modify_by', $Affectation['id_utilisateur']);
             $Retrait = [];
             foreach ($Retrait as $data):
                 $_Retrait = [
@@ -91,8 +91,32 @@ if (isset($_GET['id'])) {
                     'statut' => $data["statut"],
                 ];
                 array_push($operations, $_FS);
-                $_SOLDE += $data['montant'];
+                $_SOLDE -= $data['montant'];
             endforeach;
+
+
+            // Transaction | AUTRES-DEPENSES
+            $Transaction = ModeleClasse::getallbyName('transactions', 'id_agence', $id);
+            foreach ($Transaction as $data):
+                $Type = ModeleClasse::getoneByname('id', 'type_depenses', $data['typeTransaction']);
+                if ($data['typeTransaction'] == 1 && $data['statut_transaction'] == 'valider') //  Encaissement
+                    $_SOLDE += $data['montant'];
+                elseif ($data['typeTransaction'] == 0 && $data['statut_transaction'] == 'valider') // Decaissement
+                    $_SOLDE -= $data['montant'];
+                elseif ($data['typeTransaction'] == -1 && $data['statut_transaction'] == 'valider') // Decaissement
+                    $_SOLDE -= $data['montant'];
+
+                $Objet = [
+                    'created_at' => $data["created_at"],
+                    'libelle' => $Type['libelle'],
+                    'montant' => formatNumber2(floatval($data["montant"])),
+                    'frais' => -1,
+                    'statut' => $data["statut_transaction"],
+                ];
+                array_push($operations, $Objet);
+            endforeach;
+
+
 
             // Construire l'objet agence à retourner
             $objet = [
@@ -107,7 +131,7 @@ if (isset($_GET['id'])) {
                 "seuil" => $agence["seuil"],
                 "indicatif" => $agence["indicatif"],
                 "adresse" => $agence["adresse"] ?? null,
-                "agent" => $agent["prenom"].' '.$agent["nom"] ?? null,
+                "agent" => $agent["prenom"] . ' ' . $agent["nom"] ?? null,
                 "heureOuverture" => $agence["heureOuverture"] ?? null,
                 "heureFermeture" => $agence["heureFermeture"] ?? null,
                 "descriptions" => $agence["descriptions"] ?? null,

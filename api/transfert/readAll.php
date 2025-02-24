@@ -30,7 +30,7 @@ if (isset($_GET)) {
                     "nomDestinataire" => $data["nomDestinataire"] ?? null,  // Nom du destinataire
                     "telDestinataire" => $data["telDestinataire"] ?? null,  // Téléphone du destinataire
                     "piece" => $data["piece"] ?? null,  // Type de pièce
-                    "montant" => formatNumber2($data["montant"]) . ' | ' . $DeviseSource['libelle'] ?? 0,
+                    "montant" => formatNumber2($data["montant"] + $data['frais']) . ' | ' . $DeviseSource['libelle'] ?? 0,
                     "frais" => formatNumber2($data["frais"]) ?? 0,
                     "montantRetrait" => formatNumber2($data['montantRetrait']) . ' ' . $devise['libelle'] ?? 0,
                     "codeTransfert" => $data["codeTransfert"] ?? null,  // Code unique de transfert

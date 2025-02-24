@@ -1,5 +1,5 @@
-CREATE DATABASE db_mathyla;
-USE db_mathyla;
+-- CREATE DATABASE db_mathyla;
+-- USE db_mathyla;
 
 -- Table des utilisateurs
 CREATE TABLE utilisateurs (
@@ -146,21 +146,7 @@ CREATE TABLE transfert (
   FOREIGN KEY (created_by) REFERENCES Utilisateurs(id) ON DELETE SET NULL,
   FOREIGN KEY (modify_by) REFERENCES Utilisateurs(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
--- Trigger pour générer un code de transfert unique
-DELIMITER $$
 
-CREATE TRIGGER before_insert_transfert
-BEFORE INSERT ON transfert
-FOR EACH ROW
-BEGIN
-    SET NEW.codeTransfert = CONCAT(
-        UPPER(SUBSTRING(MD5(RAND()), 1, 4)),
-        LPAD(FLOOR(RAND() * 10000), 4, '0'),
-        UPPER(SUBSTRING(MD5(NOW()), 1, 2))
-    );
-END $$
-
-DELIMITER ;
 -- Table des retraits
 CREATE TABLE retraits (
   id INT AUTO_INCREMENT PRIMARY KEY,

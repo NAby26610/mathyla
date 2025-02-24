@@ -3,6 +3,7 @@ require_once('../../config/database.php');
 $message = "";
 
 if (isset($_POST) && !empty($_POST)) {
+    $_POST['mot_de_passe'] = "81dc9bdb52d04dc20036dbd8313ed055";
     foreach ($_POST as $key => $value) {
         $_POST[$key] = str_secure($_POST[$key]);
     }
@@ -11,10 +12,16 @@ if (isset($_POST) && !empty($_POST)) {
     try {
         // Ajout des données dans la base
         $ajout = ModeleClasse::add("utilisateurs", $_POST);
-        if ($ajout) {
-            $message = "Enregistrement avec succès";
+        if ($ajout) {            
+            $response = [
+                'status' => 1,
+                'message' => 'Utilisateur creer avec success...',
+            ];
         } else {
-            $message = "Échec de l'enregistrement";
+            $response = [
+                'status' => 1,
+                'message' => 'Erreur, veillez bien verifier les champs...',
+            ];
         }
         echo json_encode($message);
     } catch (\Throwable $th) {
