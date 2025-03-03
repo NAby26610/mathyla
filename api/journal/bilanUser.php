@@ -21,7 +21,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Récupération des envoie
         $Envoie = ModeleClasse::getallbyName('transfert', 'created_by', $id_user);
-        foreach ($Envoie as $r) {
+        foreach ($Envoie as $e) {
+            $gainsRetrait = 0;
+            $createdAt = dateConvert($e['created_at']);
+            // Vérifier si la date de création est dans l'intervalle
+            if ($createdAt >= $startDate && $createdAt <= $endDate) {
+                // GAINS
+                // Agence d'EXPEDITION
+                $AE = ModeleClasse::getoneByname('id', 'agences', $e['id_agence']);
+                $Zone_Exp = ModeleClasse::getoneByname('id', 'zones', $AE['id_zone']);
+                if ($e['id_zone'] == $Zone_Exp['id'] || $Zone_Exp['id_devise'] == $zoneUser['id_devise']):
+                    $calc = (($e['frais'] * 35) / 100);
+                    $gainsRetrait += $calc;
+                else:
+                    // LA ZONE EST DIFFERENT, ET LA DEVISE DEIFFERENT 
+                    if ($Zone_Exp['id_devise'] == 1) { // GNF - FCFA
+                        $calc = (($e['frais'] * 35) / 100);
+                        $gainsRetrait += $calc / $e['taux_du_jour'];
+                    } elseif ($Zone_Exp['id_devise'] == 2) { // FCFA - GNF
+                        $calc = (($e['frais'] * 35) / 100);
+                        $gainsRetrait += $calc * $e['taux_du_jour'];
+                    }
+                endif;
+                $OBJET = [
+                    'id' => $e['id'],
+                    'created_at' => $e['created_at'],
+                    'libelle' => 'Envoie d\'argent',
+                    'Agence' => $AgenceUser['libelle'],
+                    'montantRetrait' => formatNumber2($e['montant']),
+                    'frais' => formatNumber2($e['frais']),
+                    'gains' => ($gainsRetrait),
+                    'statut' => $e['statut'],
+                ];
+                array_push($response, $OBJET);
+            }
+        }
+
+        // Récupération des retrait
+        $Retrait = ModeleClasse::getallbyName('transfert', 'modify_by', $id_user);
+        foreach ($Retrait as $r) {
             $gainsRetrait = 0;
             $createdAt = dateConvert($r['created_at']);
             // Vérifier si la date de création est dans l'intervalle
@@ -56,45 +94,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 array_push($response, $OBJET);
             }
         }
-
-         // Récupération des retrait
-         $Retrait = ModeleClasse::getallbyName('transfert', 'modify_by', $id_user);
-         foreach ($Retrait as $r) {
-             $gainsRetrait = 0;
-             $createdAt = dateConvert($r['created_at']);
-             // Vérifier si la date de création est dans l'intervalle
-             if ($createdAt >= $startDate && $createdAt <= $endDate) {
-                 // GAINS
-                 // Agence d'EXPEDITION
-                 $AE = ModeleClasse::getoneByname('id', 'agences', $r['id_agence']);
-                 $Zone_Exp = ModeleClasse::getoneByname('id', 'zones', $AE['id_zone']);
-                 if ($r['id_zone'] == $Zone_Exp['id'] || $Zone_Exp['id_devise'] == $zoneUser['id_devise']):
-                     $calc = (($r['frais'] * 35) / 100);
-                     $gainsRetrait += $calc;
-                 else:
-                     // LA ZONE EST DIFFERENT, ET LA DEVISE DEIFFERENT 
-                     if ($Zone_Exp['id_devise'] == 1) { // GNF - FCFA
-                         $calc = (($r['frais'] * 35) / 100);
-                         $gainsRetrait += $calc / $r['taux_du_jour'];
-                     } elseif ($Zone_Exp['id_devise'] == 2) { // FCFA - GNF
-                         $calc = (($r['frais'] * 35) / 100);
-                         $gainsRetrait += $calc * $r['taux_du_jour'];
-                     }
-                 endif;
-                 $OBJET = [
-                     'id' => $r['id'],
-                     'created_at' => $r['created_at'],
-                     'libelle' => 'Bilan d\'argent',
-                     'Agence' => $AgenceUser['libelle'],
-                     'montantRetrait' => formatNumber2($r['montant']),
-                     'frais' => formatNumber2($r['frais']),
-                     'gains' => ($gainsRetrait),
-                     'statut' => $r['statut'],
-                 ];
-                 array_push($response, $OBJET);
-             }
-         }
-
         // Retour Apis
         echo json_encode($response, JSON_PRETTY_PRINT);
     } catch (\Throwable $th) {

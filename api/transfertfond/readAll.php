@@ -11,9 +11,7 @@ if (isset($_GET)) {
         if ($type == '1'):
             $read = ModeleClasse::getallDESC("transfert_fond");
         else:
-            $read = ModeleClasse::getallbyName("transfert_fond", 'id_agenceSource', $id);
-            if (empty($read))
-                $read = ModeleClasse::getallbyName("transfert_fond", 'id_agenceDestination', $id);
+            $read = ModeleClasse::getallbyName("transfert_fond", 'id_agenceDestination', $id);
         endif;
         if ($read) {
             foreach ($read as $data) {
@@ -54,7 +52,7 @@ if (isset($_GET)) {
         }
 
         // Retourner les transferts de fonds sous forme de JSON
-        echo json_encode($datatransferts, true);
+        echo json_encode($datatransferts, JSON_PRETTY_PRINT);
     } catch (\Throwable $th) {
         echo json_encode($th->getMessage());
     }

@@ -320,6 +320,15 @@ class ModeleClasse
         $result = $req->fetch();
         return $result;
     }
+    static function getoneByname2Clause($name, $table, $value, $champ, $valChamp)
+    {
+        global $connect;
+        $req = $connect->prepare("SELECT * FROM " . $table . " WHERE " . $name . "= ? AND ".$champ. "= ?");
+        $req->execute([$value, $valChamp]);
+        $result = $req->fetch();
+        return $result;
+    }
+
     // Se connecter
     static function loginUser($table, $champ1, $value1, $champ2, $value2)
     {

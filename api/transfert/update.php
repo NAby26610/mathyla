@@ -12,7 +12,7 @@ if (!empty($_POST) && isset($_POST['id'])) {
         if (!ModeleClasse::update('transfert', $_POST, $id)) {
             $reponse = [
                 'status' => 1,
-                'message' => "Retrait confirmer avec succès"
+                'message' => "Modification effectuer avec success"
             ];
         } else {
             $reponse = [

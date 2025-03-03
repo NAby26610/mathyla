@@ -22,10 +22,9 @@ try {
         if ($Agence) {
             $Zone = ModeleClasse::getoneByname('id', 'zones', $Agence['id_zone']);
 
-            if ($type === 'national') { // Transfert national
+            if ($type == 'national') { // Transfert national
                 $List = ModeleClasse::getoneByname('id', 'zones', $Agence['id_zone']);
                 $devise = ModeleClasse::getoneByname('id', 'devise', $Zone['id_devise']);
-
                 $objet = [
                     "id" => $List["id"],
                     "id_devise" => $devise["id"] ?? null,

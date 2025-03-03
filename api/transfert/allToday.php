@@ -10,7 +10,7 @@ if (isset($_GET)) {
         $totalEnvoie = 0;
         foreach ($transfert as $data):
             if (dateConvert($data['created_at']) == $today)
-                $totalEnvoie += floatval($data["montant"]);
+                $totalEnvoie += floatval($data["montant"] + $data["frais"]);
         endforeach;
 
         // Récupérer le transfert spécifique par son ID (RETRAIT)

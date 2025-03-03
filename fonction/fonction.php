@@ -137,8 +137,9 @@ function dateFR($votre_date)
 // Function de protection des trim sur les vars...
 function str_secure($str)
 {
-    return $str = htmlspecialchars(htmlentities($str));
+    return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }
+
 
 function formatNumber1($Number)
 {

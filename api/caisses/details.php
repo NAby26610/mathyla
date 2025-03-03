@@ -9,15 +9,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     try {
 
-        $affectationUser = ModeleClasse::getoneByname('id_utilisateur', 'affectations', $id_user);
-        $agenceUser = ModeleClasse::getoneByname('id', 'agences', $affectationUser['id_agence']);
-        $zoneUser = ModeleClasse::getoneByname('id', 'zones', $agenceUser['id_zone']);
-        $deviseUser = ModeleClasse::getoneByname('id', 'devise', $zoneUser['id_devise']);
-        $idDeviseUser = $deviseUser['id'];
-        $libelleDeviseUser = $deviseUser['libelle'];
+        if ($id_agence != 'null'):
+            $affectationUser = ModeleClasse::getoneByname('id_utilisateur', 'affectations', $id_user);
+            $agenceUser = ModeleClasse::getoneByname('id', 'agences', $affectationUser['id_agence']);
+            $zoneUser = ModeleClasse::getoneByname('id', 'zones', $agenceUser['id_zone']);
+            $deviseUser = ModeleClasse::getoneByname('id', 'devise', $zoneUser['id_devise']);
+            $idDeviseUser = $deviseUser['id'];
+            $libelleDeviseUser = $deviseUser['libelle'];
+        else:
+            $idDeviseUser = 1;
+            $libelleDeviseUser = 'GNF';
+        endif;
 
         // Envoie
-        $Envoie = ModeleClasse::getallbyName('transfert', 'created_by', $id_user);
+        if ($id_agence != 'null')
+            $Envoie = ModeleClasse::getallbyName('transfert', 'created_by', $id_user);
+        else
+            $Envoie = ModeleClasse::getall('transfert');
         $montantEnvoie = 0;
         $gainsEnvoie = 0;
         foreach ($Envoie as $e):
@@ -40,87 +48,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         endforeach;
 
         // Retrait
-        $Retrait = ModeleClasse::getallbyName('transfert', 'modify_by', $id_user);
+        if ($id_agence != 'null')
+            $Retrait = ModeleClasse::getallbyName('transfert', 'modify_by', $id_user);
+        else
+            $Retrait = ModeleClasse::getall('transfert');
         $dataRetrait = [];
         $montantRetrait = 0;
         $gainsRetrait = 0;
         foreach ($Retrait as $r):
-            $createdAt = dateConvertMois($e['created_at']);
-            // Vérifier si la date de création est dans l'intervalle
-            if ($createdAt == CE_MOIS()) {
-                // Agence d'EXPEDITION
-                $AE = ModeleClasse::getoneByname('id', 'agences', $r['id_agence']);
-                $Zone_Exp = ModeleClasse::getoneByname('id', 'zones', $AE['id_zone']);
-                if ($r['id_zone'] == $Zone_Exp['id'] || $Zone_Exp['id_devise'] == $idDeviseUser):
-                    $calc = (($r['frais'] * 35) / 100);
-                    $gainsRetrait += $calc;
-                else:
-                    // LA ZONE EST DIFFERENT, ET LA DEVISE DEIFFERENT 
-                    if ($Zone_Exp['id_devise'] == 1) { // GNF - FCFA
+            if ($r['modify_by'] != NULL):
+                $createdAt = dateConvertMois($e['created_at']);
+                // Vérifier si la date de création est dans l'intervalle
+                if ($createdAt == CE_MOIS()) {
+                    // Agence d'EXPEDITION
+                    $AE = ModeleClasse::getoneByname('id', 'agences', $r['id_agence']);
+                    $Zone_Exp = ModeleClasse::getoneByname('id', 'zones', $AE['id_zone']);
+                    if ($r['id_zone'] == $Zone_Exp['id'] || $Zone_Exp['id_devise'] == $idDeviseUser):
                         $calc = (($r['frais'] * 35) / 100);
-                        $gainsRetrait += $calc / $r['taux_du_jour'];
-                    } elseif ($Zone_Exp['id_devise'] == 2) { // FCFA - GNF
-                        $calc = (($r['frais'] * 35) / 100);
-                        $gainsRetrait += $calc * $r['taux_du_jour'];
-                    }
-                endif;
-                $montantRetrait += $r['montantRetrait'];
+                        $gainsRetrait += $calc;
+                    else:
+                        // LA ZONE EST DIFFERENT, ET LA DEVISE DEIFFERENT 
+                        if ($Zone_Exp['id_devise'] == 1) { // GNF - FCFA
+                            $calc = (($r['frais'] * 35) / 100);
+                            $gainsRetrait += $calc / $r['taux_du_jour'];
+                        } elseif ($Zone_Exp['id_devise'] == 2) { // FCFA - GNF
+                            $calc = (($r['frais'] * 35) / 100);
+                            $gainsRetrait += $calc * $r['taux_du_jour'];
+                        }
+                    endif;
+                    $montantRetrait += $r['montantRetrait'];
 
-                $Objet = [
-                    'libelle' => "Retrait d'argent",
-                    'montant' => formatNumber2($r['montantRetrait']) ?? 0,
-                    'statut' => $r['statut']
-                ];
-                array_push($tableData, $Objet);
-            }
+                    $Objet = [
+                        'libelle' => "Retrait d'argent",
+                        'montant' => formatNumber2($r['montantRetrait']) ?? 0,
+                        'statut' => $r['statut']
+                    ];
+                    array_push($tableData, $Objet);
+                }
+            endif;
         endforeach;
 
 
         // Transfert de fond | ENTRANT
-        $F_ET = ModeleClasse::getallbyName('transfert_fond', 'modify_by', $id_user);
         $dataF_ET = [];
         $montantEntrant = 0;
+        if ($id_agence != 'null')
+            $F_ET = ModeleClasse::getallbyName('transfert_fond', 'modify_by', $id_user);
+        else
+            $F_ET = ModeleClasse::getall('transfert_fond');
         foreach ($F_ET as $fond1):
-            $createdAt = dateConvertMois($e['created_at']);
-            // Vérifier si la date de création est dans l'intervalle
-            if ($createdAt == CE_MOIS()) {
-                // ----------------------------------------------------------------
-                if ($fond1['statut'] == 'valider')
-                    $montantEntrant += $fond1['montant'];
+            if ($fond1['statut'] == 'valider'):
+                $createdAt = dateConvertMois($e['created_at']);
+                // Vérifier si la date de création est dans l'intervalle
+                if ($createdAt == CE_MOIS() && $fond1['modify_by'] != NULL) {
+                    // ----------------------------------------------------------------
+                    if ($fond1['statut'] == 'valider')
+                        $montantEntrant += $fond1['montant'];
 
-                $Objet = [
-                    'libelle' => "Fond Entrant",
-                    'montant' => formatNumber2($fond1['montant']) ?? 0,
-                    'statut' => $fond1['statut']
-                ];
-                array_push($tableData, $Objet);
-            }
+                    $Objet = [
+                        'libelle' => "Fond Entrant",
+                        'montant' => formatNumber2($fond1['montant']) ?? 0,
+                        'statut' => $fond1['statut']
+                    ];
+                    array_push($tableData, $Objet);
+                }
+            endif;
         endforeach;
 
-
         // Transfert de fond | SORTANT
-        $F_ST = ModeleClasse::getallbyName('transfert_fond', 'id_agenceSource', $id_agence);
         $dataF_ST = [];
         $montantSortant = 0;
+        if ($id_agence != 'null')
+            $F_ST = ModeleClasse::getallbyName('transfert_fond', 'id_agenceSource', $id_agence);
+        else
+            $F_ST = ModeleClasse::getall('transfert_fond');
         foreach ($F_ST as $fond2):
-            $createdAt = dateConvertMois($e['created_at']);
-            // Vérifier si la date de création est dans l'intervalle
-            if ($createdAt == CE_MOIS()) {
-                // ----------------------------------------------------------------
-                if ($fond2['statut'] == 'valider')
-                    $montantSortant += $fond2['montant'];
+            if ($fond2['statut'] == 'valider'):
+                $createdAt = dateConvertMois($e['created_at']);
+                // Vérifier si la date de création est dans l'intervalle
+                if ($createdAt == CE_MOIS()) {
+                    // ----------------------------------------------------------------
+                    if ($fond2['statut'] == 'valider')
+                        $montantSortant += $fond2['montant'];
 
-                $Objet = [
-                    'libelle' => "Fond Sortant",
-                    'montant' => formatNumber2($fond2['montant']) ?? 0,
-                    'statut' => $fond2['statut']
-                ];
-                array_push($tableData, $Objet);
-            }
+                    $Objet = [
+                        'libelle' => "Fond Sortant",
+                        'montant' => formatNumber2($fond2['montant']) ?? 0,
+                        'statut' => $fond2['statut']
+                    ];
+                    array_push($tableData, $Objet);
+                }
+            endif;
         endforeach;
 
         // Transaction | AUTRES-DEPENSES
-        $Transaction = ModeleClasse::getallbyName('transactions', 'id_agence', $id_agence);
+        if ($id_agence != 'null')
+            $Transaction = ModeleClasse::getallbyName('transactions', 'id_agence', $id_agence);
+        else
+            $Transaction = ModeleClasse::getall('transactions');
         $Encaissement = 0;
         $Decaissement = 0;
         $retraitGainsAgent = 0;
@@ -160,7 +185,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             'retraitGainsAgent' => formatNumber2($retraitGainsAgent) . ' ' . $libelleDeviseUser,
             'gainsDepot' => formatNumber2($gainsEnvoie) . ' ' . $libelleDeviseUser,
             'gainsRetrait' => formatNumber2($gainsRetrait) . ' ' . $libelleDeviseUser,
-            'solde_du_jour' => formatNumber2($_SOLDE) . ' ' . $libelleDeviseUser,
             'tableData' => $tableData
         ];
 

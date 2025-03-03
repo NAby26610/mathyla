@@ -27,49 +27,22 @@ if (isset($_POST) && !empty($_POST)) {
             exit;
         }
 
-        // Vérification si l'agence existe déjà dans la base de données
-        $agenceExistante = ModeleClasse::getoneByname('id', 'agences', $id_agence);
-
-        if (!$agenceExistante) {
-            // echo json_encode(["error" => "L'agence avec l'id $id_agence n'existe pas."]);
-            $response = [
-                'status' => 0,
-                'message' => 'Cette agence est manquante',
-            ];
-            exit;
-        }
-
-        // Vérification si l'utilisateur existe déjà dans la base de données
-        $utilisateurExistant = ModeleClasse::getoneByname('id', 'utilisateurs', $id_utilisateur);
-
-        if (!$utilisateurExistant) {
-            // echo json_encode(["error" => "L'utilisateur avec l'id $id_utilisateur n'existe pas."]);
-            $response = [
-                'status' => 0,
-                'message' => 'Utilisateur manquant',
-            ];
-            exit;
-        }
-
         // Vérification de l'existence de l'affectation
-        $existingAffectation = ModeleClasse::getOne("affectations", "id_agence = $id_agence AND id_utilisateur = $id_utilisateur");
-
+        // $existingAffectation = ModeleClasse::getOne("affectations", "id_agence = $id_agence AND id_utilisateur = $id_utilisateur");
+        $existingAffectation = ModeleClasse::getoneByname2Clause('id_agence',"affectations", $id_agence, 'statut', 'actif');
+        $existingUserInAffectation = ModeleClasse::getoneByname2Clause('id_utilisateur',"affectations", $id_utilisateur, 'statut', 'actif');
         // Si l'affectation n'existe pas, créer une nouvelle affectation
-        if (!$existingAffectation) {
+        if (!$existingAffectation && !$existingUserInAffectation) {
             // Ajouter une nouvelle affectation
-            $ajout = ModeleClasse::add("affectations", [
-                'id_agence' => $id_agence,
-                'id_utilisateur' => $id_utilisateur,
-                'statut' => isset($statut) ? $statut : 'actif',  // Si statut n'est pas défini, par défaut 'actif'
-            ]);
+            $ajout = ModeleClasse::add('affectations', $_POST);
 
             if (!$ajout) {
                 $message_ = 'Bonjour, ' . $utilisateurExistant['prenom'] . ' ' . $utilisateurExistant['nom'] . ', Votre compte en tant que gerant a ete creer chez Mathyla-Transfert, connectez-vous a l\'adresse : https://matyla.spa-dev.com) avec les access suivant : ' . $utilisateurExistant['telephone'] . ' | MPD: 1234';
                 // $message = "Affectation ajoutée avec succès.";
-                Nimba_SMS($utilisateurExistant['telephone'], $message_);
+                // Nimba_SMS($utilisateurExistant['telephone'], $message_);
                 $response = [
                     'status' => 1,
-                    'message' => 'Affectation ajoutée avec succès...',
+                    'message' => 'Agence affecter avec succès...',
                 ];
             } else {
                 // $message = "Échec de l'ajout de l'affectation.";
@@ -82,28 +55,8 @@ if (isset($_POST) && !empty($_POST)) {
             // $message = "Cette affectation existe déjà.";
             $response = [
                 'status' => 0,
-                'message' => 'Cette affectation existe déjà',
+                'message' => 'Une affectation existe déjà pour cette agence...',
             ];
-        }
-
-        // Récupérer l'affectation spécifique correspondant à l'id_agence et id_utilisateur
-        $affectation = ModeleClasse::getOne("affectations", "id_agence = $id_agence AND id_utilisateur = $id_utilisateur");
-
-        // Vérifier si l'affectation a été trouvée
-        if (!$affectation) {
-            // echo json_encode([ "error" => "Aucune affectation trouvée pour cet id_agence et id_utilisateur." ]);
-            $response = [
-                'status' => 0,
-                'Aucune affectation trouvée pour cette agence et cet utilisateur.',
-            ];
-            exit;
-        }
-
-        // Nettoyer les données en supprimant les clés indésirables (1 à 7)
-        foreach ($affectation as $key => $value) {
-            if (is_numeric($key)) {
-                unset($affectation[$key]);
-            }
         }
 
         // Retourner la réponse avec le message et l'affectation spécifique

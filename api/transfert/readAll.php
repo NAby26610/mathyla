@@ -8,9 +8,9 @@ if (isset($_GET)) {
         // Récupérer tous les transferts triés par ordre décroissant
         $USER = ModeleClasse::getoneByname('id', 'utilisateurs', $id);
         if ($USER['roles'] == 'admin')
-            $read = ModeleClasse::getall("transfert");
+            $read = ModeleClasse::getallDESC("transfert");
         else
-            $read = ModeleClasse::getallbyName("transfert", "created_by", $id);
+            $read = ModeleClasse::getallbyNameDESC("transfert", "created_by", $id);
         if ($read) {
             foreach ($read as $data) {
                 // Récupérer les informations sur la zone associée au transfert
